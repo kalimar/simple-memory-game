@@ -1,0 +1,123 @@
+<html>
+<head>
+  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link href='http://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.js"></script>
+</head>
+<body>
+  <h1>Memory Game</h1>
+  <h5 class="restart-button">Restart</h5>
+  <div id="game">
+    <ul id="cards">
+      <li class="card-back" data="0"></li>
+      <li class="card-back" data="1"></li>
+      <li class="card-back" data="2"></li>
+      <li class="card-back" data="3"></li>
+      <li class="card-back" data="4"></li>
+      <li class="card-back" data="5"></li>
+      <li class="card-back" data="6"></li>
+      <li class="card-back" data="7"></li>
+      <li class="card-back" data="8"></li>
+      <li class="card-back" data="9"></li>
+    </ul>
+  </div>
+
+  <h3 class="continue-button hide">"Ready to continue?"</h3>
+
+  <footer>
+  <script>
+  var cards_picked = [];
+  $( document ).ready(function() {
+    start_game();
+  });
+
+  $(".continue-button").click(function (evt) {
+    continue_game();
+  });
+
+  $(".restart-button").click(function (evt) {
+    $('#cards').find('li').each(function() {
+      $(this).empty();
+    });
+    start_game();
+  });
+
+  $(".card-back").click(function (evt) {
+    if (cards_picked.length < 2) {
+      show_card($(this));
+      var card_picked = {
+        place : $(this).attr('data'),
+        face : $(this).data('card').face
+      }
+      cards_picked.push(card_picked);
+    }
+    if (cards_picked.length === 2) {
+      if (cards_picked[0].face === cards_picked[1].face) {
+        $('li[data="' + cards_picked[0].place + '"]').data('card').cleared = true;
+        $('li[data="' + cards_picked[1].place + '"]').data('card').cleared = true;
+      } else {
+        alert("Almost! Take another look.");
+        show_playable_cards();
+        show_continue_button();
+      }
+      cards_picked = [];
+    }
+  });
+
+  function show_card(el) {
+    el.removeClass('card-back');
+    el.text( el.data('card').face);
+  };
+
+  function start_game() {
+    shuffle_deck();
+    show_playable_cards();
+    show_continue_button();
+  };
+
+  function continue_game() {
+    $(".continue-button").addClass('hide');
+    $('#cards').find('li').each(function() {
+      if($(this).data('card').cleared === false) {
+        $(this).empty();
+        $(this).addClass('card-back');
+      }
+    });
+  };
+
+  function shuffle_deck() {
+    var deck = [1,1,2,2,3,3,4,4,5,5];
+    var face, card;
+    shuffle(deck);
+    $('#cards').find('li').each(function() {
+      face = deck.pop();
+      var card = {
+        face: face,
+        cleared: false
+      }
+      $(this).data('card',card);
+    });
+  };
+
+  function show_playable_cards() {
+    $('#cards').find('li').each(function() {
+      if ($('li').data('card').cleared === false) {
+        show_card($(this));
+      }
+    });
+  };
+
+  function show_continue_button() {
+    $('.continue-button').removeClass('hide');
+  };
+
+  // From Stack overflow http://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array-in-javascript
+  function shuffle(o) { //v1.0
+    for (var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+    return o;
+  };
+  </script>
+</footer>
+</body>
+</html>
